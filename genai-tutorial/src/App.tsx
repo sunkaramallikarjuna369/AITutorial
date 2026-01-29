@@ -27,6 +27,7 @@ import {
   Home
 } from 'lucide-react'
 
+import Module00MathForAI from './modules/Module00MathForAI'
 import Module01Introduction from './modules/Module01Introduction'
 import Module02MachineLearning from './modules/Module02MachineLearning'
 import Module03NeuralNetworks from './modules/Module03NeuralNetworks'
@@ -45,7 +46,10 @@ import Module15Ethics from './modules/Module15Ethics'
 import Module16Applications from './modules/Module16Applications'
 import Module17Agents from './modules/Module17Agents'
 
+import { Calculator } from 'lucide-react'
+
 const modules = [
+  { id: 0, title: 'Math for AI', icon: Calculator, color: 'bg-gradient-to-r from-blue-500 to-purple-500', description: 'Essential math with 4W+H explanations' },
   { id: 1, title: 'Introduction to AI', icon: Brain, color: 'bg-blue-500', description: 'What is AI and why it matters' },
   { id: 2, title: 'Machine Learning Basics', icon: Network, color: 'bg-green-500', description: 'Teaching computers to learn' },
   { id: 3, title: 'Neural Networks', icon: Layers, color: 'bg-purple-500', description: 'Brain-inspired computing' },
@@ -66,6 +70,7 @@ const modules = [
 ]
 
 const moduleComponents = [
+  Module00MathForAI,
   Module01Introduction,
   Module02MachineLearning,
   Module03NeuralNetworks,

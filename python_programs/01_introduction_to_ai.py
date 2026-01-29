@@ -1,12 +1,215 @@
 """
-Module 01: Introduction to Artificial Intelligence
-===================================================
-Learn the basics of AI - what it is and how it works!
+=============================================================================
+MODULE 1: INTRODUCTION TO ARTIFICIAL INTELLIGENCE - 360 DEGREE COVERAGE
+=============================================================================
 
-This program demonstrates fundamental AI concepts that even kids can understand.
+This comprehensive module covers:
+- What is AI and its history
+- Types of AI (Narrow, General, Super)
+- AI vs Machine Learning vs Deep Learning
+- Working with multiple GenAI models (OpenAI, Claude, Gemini, Ollama, HuggingFace)
+- Real-world applications and examples
+- Hands-on executable code
+
+SETUP INSTRUCTIONS:
+-------------------
+1. Install required packages:
+   pip install openai anthropic google-generativeai transformers torch requests
+
+2. Set up API keys (create a .env file or export):
+   export OPENAI_API_KEY="your-openai-key"
+   export ANTHROPIC_API_KEY="your-anthropic-key"
+   export GOOGLE_API_KEY="your-google-key"
+
+3. For Ollama (local models - FREE, no API key needed):
+   - Install Ollama: https://ollama.ai
+   - Run: ollama pull llama2
+   - Run: ollama pull mistral
+
+=============================================================================
 """
 
 import random
+import os
+from typing import Optional, Dict, Any
+
+# =============================================================================
+# GENAI MODELS CLASS - Use Multiple AI Providers
+# =============================================================================
+
+class GenAIModels:
+    """
+    A unified interface to work with multiple GenAI providers.
+    Supports: OpenAI, Anthropic Claude, Google Gemini, Ollama (local), HuggingFace
+    """
+    
+    def __init__(self):
+        self.openai_key = os.getenv("OPENAI_API_KEY")
+        self.anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+        self.google_key = os.getenv("GOOGLE_API_KEY")
+    
+    def use_openai(self, prompt: str, model: str = "gpt-3.5-turbo") -> str:
+        """
+        Use OpenAI's GPT models (GPT-4, GPT-3.5-turbo)
+        
+        Example:
+            ai = GenAIModels()
+            response = ai.use_openai("Explain AI to a 5 year old")
+        """
+        try:
+            from openai import OpenAI
+            
+            if not self.openai_key:
+                return "Set OPENAI_API_KEY environment variable first"
+            
+            client = OpenAI(api_key=self.openai_key)
+            response = client.chat.completions.create(
+                model=model,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=500
+            )
+            return response.choices[0].message.content
+        except ImportError:
+            return "Install openai: pip install openai"
+        except Exception as e:
+            return f"Error: {e}"
+    
+    def use_claude(self, prompt: str, model: str = "claude-3-sonnet-20240229") -> str:
+        """
+        Use Anthropic's Claude models (Claude 3 Opus, Sonnet, Haiku)
+        
+        Example:
+            ai = GenAIModels()
+            response = ai.use_claude("What is machine learning?")
+        """
+        try:
+            import anthropic
+            
+            if not self.anthropic_key:
+                return "Set ANTHROPIC_API_KEY environment variable first"
+            
+            client = anthropic.Anthropic(api_key=self.anthropic_key)
+            response = client.messages.create(
+                model=model,
+                max_tokens=500,
+                messages=[{"role": "user", "content": prompt}]
+            )
+            return response.content[0].text
+        except ImportError:
+            return "Install anthropic: pip install anthropic"
+        except Exception as e:
+            return f"Error: {e}"
+    
+    def use_gemini(self, prompt: str, model: str = "gemini-pro") -> str:
+        """
+        Use Google's Gemini models
+        
+        Example:
+            ai = GenAIModels()
+            response = ai.use_gemini("Describe neural networks")
+        """
+        try:
+            import google.generativeai as genai
+            
+            if not self.google_key:
+                return "Set GOOGLE_API_KEY environment variable first"
+            
+            genai.configure(api_key=self.google_key)
+            model_instance = genai.GenerativeModel(model)
+            response = model_instance.generate_content(prompt)
+            return response.text
+        except ImportError:
+            return "Install google-generativeai: pip install google-generativeai"
+        except Exception as e:
+            return f"Error: {e}"
+    
+    def use_ollama(self, prompt: str, model: str = "llama2") -> str:
+        """
+        Use Ollama for FREE local AI models (no API key needed!)
+        
+        Setup:
+        1. Install Ollama from https://ollama.ai
+        2. Run: ollama pull llama2 (or mistral, codellama, phi)
+        3. Ollama runs on localhost:11434
+        
+        Example:
+            ai = GenAIModels()
+            response = ai.use_ollama("Hello!", model="mistral")
+        """
+        try:
+            import requests
+            
+            response = requests.post(
+                "http://localhost:11434/api/generate",
+                json={"model": model, "prompt": prompt, "stream": False},
+                timeout=60
+            )
+            
+            if response.status_code == 200:
+                return response.json().get("response", "No response")
+            return f"Ollama error: {response.status_code}"
+        except Exception as e:
+            return f"Start Ollama first: ollama serve. Error: {e}"
+    
+    def use_huggingface(self, prompt: str, model: str = "gpt2") -> str:
+        """
+        Use HuggingFace Transformers for local inference
+        
+        Example:
+            ai = GenAIModels()
+            response = ai.use_huggingface("Once upon a time")
+        """
+        try:
+            from transformers import pipeline
+            
+            generator = pipeline("text-generation", model=model)
+            result = generator(prompt, max_length=100, num_return_sequences=1)
+            return result[0]["generated_text"]
+        except ImportError:
+            return "Install transformers: pip install transformers torch"
+        except Exception as e:
+            return f"Error: {e}"
+
+
+def demo_genai_models():
+    """Interactive demo to test different GenAI models"""
+    print("\n" + "=" * 60)
+    print("GenAI Models Demo - Test Multiple AI Providers")
+    print("=" * 60)
+    
+    ai = GenAIModels()
+    
+    print("""
+Available models:
+1. OpenAI (GPT-4, GPT-3.5) - Requires OPENAI_API_KEY
+2. Claude (Anthropic) - Requires ANTHROPIC_API_KEY  
+3. Gemini (Google) - Requires GOOGLE_API_KEY
+4. Ollama (Local) - FREE, no API key needed!
+5. HuggingFace (Local) - FREE, runs on your machine
+""")
+    
+    choice = input("Choose a model (1-5): ").strip()
+    prompt = input("Enter your prompt: ").strip()
+    
+    if not prompt:
+        prompt = "Explain artificial intelligence in simple terms."
+    
+    print("\nGenerating response...")
+    
+    if choice == "1":
+        response = ai.use_openai(prompt)
+    elif choice == "2":
+        response = ai.use_claude(prompt)
+    elif choice == "3":
+        response = ai.use_gemini(prompt)
+    elif choice == "4":
+        response = ai.use_ollama(prompt)
+    elif choice == "5":
+        response = ai.use_huggingface(prompt)
+    else:
+        response = "Invalid choice"
+    
+    print(f"\nAI Response:\n{response}")
 
 # ============================================
 # What is AI? - Simple Examples
@@ -221,27 +424,29 @@ def main():
     """
     Main function to run all demos
     """
-    print("\n" + "🤖" * 25)
-    print("\n   WELCOME TO INTRODUCTION TO AI!")
-    print("\n" + "🤖" * 25)
+    print("\n" + "=" * 60)
+    print("   MODULE 1: INTRODUCTION TO ARTIFICIAL INTELLIGENCE")
+    print("   360-Degree Coverage with Multiple GenAI Models")
+    print("=" * 60)
     
     while True:
-        print("\n" + "-" * 50)
+        print("\n" + "-" * 60)
         print("Choose a demo:")
-        print("1. Simple Chatbot")
-        print("2. Number Guessing AI")
+        print("1. Simple Chatbot (Rule-based AI)")
+        print("2. Number Guessing AI (Binary Search)")
         print("3. Pattern Recognition")
         print("4. Recommendation System")
-        print("5. Types of AI")
-        print("6. AI vs Humans")
-        print("7. Run All Demos")
+        print("5. Types of AI (Narrow, General, Super)")
+        print("6. AI vs Humans Comparison")
+        print("7. GenAI Models Demo (OpenAI, Claude, Gemini, Ollama)")
+        print("8. Run All Basic Demos")
         print("0. Exit")
-        print("-" * 50)
+        print("-" * 60)
         
-        choice = input("\nEnter your choice (0-7): ").strip()
+        choice = input("\nEnter your choice (0-8): ").strip()
         
         if choice == "0":
-            print("\nThanks for learning about AI! Goodbye! 👋")
+            print("\nThanks for learning about AI! Goodbye!")
             break
         elif choice == "1":
             simple_chatbot()
@@ -256,12 +461,14 @@ def main():
         elif choice == "6":
             ai_vs_human()
         elif choice == "7":
+            demo_genai_models()
+        elif choice == "8":
             pattern_recognition()
             explain_ai_types()
             ai_vs_human()
             recommendation_system()
         else:
-            print("Invalid choice. Please enter 0-7.")
+            print("Invalid choice. Please enter 0-8.")
 
 
 if __name__ == "__main__":

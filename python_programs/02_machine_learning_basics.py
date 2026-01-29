@@ -1,13 +1,90 @@
 """
-Module 02: Machine Learning Basics
-==================================
-Learn how computers learn from data!
+=============================================================================
+MODULE 2: MACHINE LEARNING BASICS - 360 DEGREE COVERAGE
+=============================================================================
 
-This program demonstrates fundamental ML concepts with interactive examples.
+This comprehensive module covers:
+- What is Machine Learning and types (Supervised, Unsupervised, Reinforcement)
+- Linear Regression from scratch
+- K-Nearest Neighbors classification
+- Decision Trees
+- Train/Test Split and Cross-Validation
+- Overfitting vs Underfitting
+- Gradient Descent optimization
+- Using GenAI models to explain ML concepts
+- Scikit-learn examples
+
+SETUP INSTRUCTIONS:
+-------------------
+1. Install required packages:
+   pip install scikit-learn numpy pandas matplotlib
+   pip install openai anthropic google-generativeai requests
+
+2. Set up API keys for GenAI features:
+   export OPENAI_API_KEY="your-key"
+   export ANTHROPIC_API_KEY="your-key"
+
+3. For Ollama (FREE local models):
+   Install from https://ollama.ai
+   Run: ollama pull llama2
+
+=============================================================================
 """
 
 import random
 import math
+import os
+from typing import Optional, List, Tuple
+
+
+# =============================================================================
+# GENAI HELPER - Use AI to explain ML concepts
+# =============================================================================
+
+class MLExplainer:
+    """Use GenAI models to explain ML concepts in simple terms"""
+    
+    def __init__(self):
+        self.openai_key = os.getenv("OPENAI_API_KEY")
+    
+    def explain_with_openai(self, concept: str) -> str:
+        """Get AI explanation of an ML concept"""
+        try:
+            from openai import OpenAI
+            if not self.openai_key:
+                return f"[Set OPENAI_API_KEY to get AI explanations of {concept}]"
+            
+            client = OpenAI(api_key=self.openai_key)
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{
+                    "role": "user", 
+                    "content": f"Explain {concept} in machine learning to a beginner in 3 sentences."
+                }],
+                max_tokens=200
+            )
+            return response.choices[0].message.content
+        except:
+            return f"[Install openai package for AI explanations]"
+    
+    def explain_with_ollama(self, concept: str) -> str:
+        """Get local AI explanation using Ollama"""
+        try:
+            import requests
+            response = requests.post(
+                "http://localhost:11434/api/generate",
+                json={
+                    "model": "llama2",
+                    "prompt": f"Explain {concept} in machine learning simply in 3 sentences.",
+                    "stream": False
+                },
+                timeout=30
+            )
+            if response.status_code == 200:
+                return response.json().get("response", "")
+            return "[Ollama not responding]"
+        except:
+            return "[Start Ollama with: ollama serve]"
 
 # ============================================
 # What is Machine Learning?
@@ -413,13 +490,71 @@ The "Learning Rate" controls step size:
 # Main Program
 # ============================================
 
+# =============================================================================
+# SCIKIT-LEARN EXAMPLES - Real ML Library
+# =============================================================================
+
+def sklearn_demo():
+    """Demonstrate real ML with scikit-learn"""
+    print("\n" + "=" * 60)
+    print("Scikit-Learn Demo: Real Machine Learning Library")
+    print("=" * 60)
+    
+    try:
+        from sklearn.linear_model import LinearRegression
+        from sklearn.neighbors import KNeighborsClassifier
+        from sklearn.tree import DecisionTreeClassifier
+        from sklearn.model_selection import train_test_split
+        from sklearn.metrics import accuracy_score
+        import numpy as np
+        
+        print("\n1. Linear Regression with sklearn:")
+        print("-" * 40)
+        X = np.array([[1000], [1500], [2000], [2500], [3000]])
+        y = np.array([150, 200, 250, 300, 350])
+        
+        model = LinearRegression()
+        model.fit(X, y)
+        
+        prediction = model.predict([[2200]])
+        print(f"   House 2200 sq ft predicted price: ${prediction[0]:.0f}k")
+        print(f"   Model coefficient: {model.coef_[0]:.4f}")
+        
+        print("\n2. KNN Classification with sklearn:")
+        print("-" * 40)
+        X = np.array([[150, 8], [160, 7], [180, 3], [190, 4], [120, 10]])
+        y = np.array(["Apple", "Apple", "Orange", "Orange", "Grape"])
+        
+        knn = KNeighborsClassifier(n_neighbors=3)
+        knn.fit(X, y)
+        
+        test = np.array([[155, 7]])
+        print(f"   Fruit [155g, sweetness 7] predicted: {knn.predict(test)[0]}")
+        
+        print("\n3. Decision Tree with sklearn:")
+        print("-" * 40)
+        X = np.array([[1, 1], [1, 0], [0, 1], [0, 0]])  # [sunny, humid]
+        y = np.array(["No", "Yes", "Yes", "Yes"])  # play tennis
+        
+        tree = DecisionTreeClassifier()
+        tree.fit(X, y)
+        
+        print(f"   Sunny + Humid: {tree.predict([[1, 1]])[0]}")
+        print(f"   Sunny + Not Humid: {tree.predict([[1, 0]])[0]}")
+        
+    except ImportError:
+        print("\nInstall scikit-learn: pip install scikit-learn numpy")
+        print("Then run this demo again!")
+
+
 def main():
     """
     Main function to run all demos
     """
-    print("\n" + "🤖" * 25)
-    print("\n   MACHINE LEARNING BASICS")
-    print("\n" + "🤖" * 25)
+    print("\n" + "=" * 60)
+    print("   MODULE 2: MACHINE LEARNING BASICS")
+    print("   360-Degree Coverage with GenAI Integration")
+    print("=" * 60)
     
     while True:
         print("\n" + "-" * 60)
@@ -431,14 +566,15 @@ def main():
         print("5. Train/Test Split")
         print("6. Overfitting vs Underfitting")
         print("7. Gradient Descent (How Models Learn)")
-        print("8. Run All Demos")
+        print("8. Scikit-Learn Demo (Real ML Library)")
+        print("9. Run All Demos")
         print("0. Exit")
         print("-" * 60)
         
-        choice = input("\nEnter your choice (0-8): ").strip()
+        choice = input("\nEnter your choice (0-9): ").strip()
         
         if choice == "0":
-            print("\nThanks for learning about ML! Goodbye! 👋")
+            print("\nThanks for learning about ML! Goodbye!")
             break
         elif choice == "1":
             explain_machine_learning()
@@ -455,15 +591,15 @@ def main():
         elif choice == "7":
             gradient_descent_demo()
         elif choice == "8":
+            sklearn_demo()
+        elif choice == "9":
             explain_machine_learning()
             linear_regression_demo()
             knn_demo()
             decision_tree_demo()
-            train_test_split_demo()
-            overfitting_demo()
-            gradient_descent_demo()
+            sklearn_demo()
         else:
-            print("Invalid choice. Please enter 0-8.")
+            print("Invalid choice. Please enter 0-9.")
 
 
 if __name__ == "__main__":
