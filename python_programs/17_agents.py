@@ -1,308 +1,688 @@
 """
-Module 17: AI Agents
-====================
-Autonomous AI systems that can reason, plan, and take actions!
+=============================================================================
+MODULE 17: AI AGENTS - COMPREHENSIVE 360 DEGREE COVERAGE
+=============================================================================
+
+This module provides COMPLETE coverage of AI Agents including:
+- 4W+H Explanations (What, Why, When, Where, How)
+- Agent Architectures (ReAct, Tool-Use, Planning)
+- Multi-Agent Systems
+- Implementation Examples
+- GenAI Model Integrations
+- Interview Questions
+- Common Pitfalls
+
+SETUP:
+------
+pip install langchain openai
+
+For GenAI features:
+pip install openai anthropic google-generativeai
+
+=============================================================================
 """
 
-def explain_agents():
-    print("=" * 60)
-    print("AI Agents - Autonomous AI Systems")
-    print("=" * 60)
+import os
+from typing import List, Dict, Callable, Optional
+
+
+# =============================================================================
+# GENAI INTEGRATION
+# =============================================================================
+
+class AgentAssistant:
+    """Use GenAI models for agent explanations and demos"""
+    
+    def __init__(self):
+        self.openai_key = os.getenv("OPENAI_API_KEY")
+    
+    def explain_with_openai(self, concept: str) -> str:
+        try:
+            from openai import OpenAI
+            if not self.openai_key:
+                return "[Set OPENAI_API_KEY]"
+            client = OpenAI(api_key=self.openai_key)
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": f"Explain {concept} in AI agents with examples."}],
+                max_tokens=500
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            return f"[Error: {e}]"
+    
+    def explain_with_ollama(self, concept: str, model: str = "llama2") -> str:
+        try:
+            import requests
+            response = requests.post(
+                "http://localhost:11434/api/generate",
+                json={"model": model, "prompt": f"Explain {concept} in AI agents.", "stream": False},
+                timeout=60
+            )
+            return response.json().get("response", "") if response.status_code == 200 else "[Ollama error]"
+        except Exception as e:
+            return f"[Start Ollama: ollama serve. Error: {e}]"
+    
+    def run_simple_agent(self, task: str) -> str:
+        """Run a simple ReAct-style agent"""
+        try:
+            from openai import OpenAI
+            if not self.openai_key:
+                return "[Set OPENAI_API_KEY to run agent]"
+            
+            client = OpenAI(api_key=self.openai_key)
+            
+            system_prompt = """You are a helpful AI agent. For each task, think step by step:
+
+1. Thought: Analyze what needs to be done
+2. Action: Decide what action to take (or "Final Answer" if done)
+3. Observation: Note the result
+
+Available actions:
+- Calculate: Do math calculations
+- Search: Look up information (simulated)
+- Final Answer: Provide the final response
+
+Format your response as:
+Thought: [your reasoning]
+Action: [action name]: [action input]
+Observation: [result]
+... (repeat as needed)
+Final Answer: [your final response]"""
+            
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": f"Task: {task}"}
+                ],
+                max_tokens=500
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            return f"[Agent Error: {e}]"
+
+
+# =============================================================================
+# SECTION 1: COMPREHENSIVE AI AGENTS EXPLANATION (4W+H)
+# =============================================================================
+
+def explain_agents_comprehensive():
+    """Comprehensive 360-degree explanation of AI Agents"""
+    print("=" * 70)
+    print("AI AGENTS - COMPREHENSIVE 360 DEGREE COVERAGE")
+    print("=" * 70)
+    
     print("""
-AI Agents are AI systems that can ACT autonomously!
+WHAT ARE AI AGENTS?
+===================
 
-Regular AI (ChatGPT): Answers questions
-AI Agent: Actually DOES things for you!
+AI Agents are autonomous systems that perceive their environment,
+make decisions, and take actions to achieve goals.
 
-Key Components:
-1. Brain (LLM): Makes decisions
-2. Tools: Search, code execution, APIs
-3. Memory: Remembers past actions
-4. Planning: Creates step-by-step plans
+KEY CHARACTERISTICS:
+    1. Autonomy: Operate without constant human input
+    2. Reactivity: Respond to environment changes
+    3. Proactivity: Take initiative to achieve goals
+    4. Social ability: Interact with other agents/humans
 
-Agent Types:
-- ReAct: Reason + Act (think, then do)
-- Tool-Using: Uses external tools
-- Planning: Creates and executes plans
-- Multi-Agent: Multiple agents working together
+LLM-BASED AGENTS:
+    LLM (brain) + Tools (capabilities) + Memory (context) = Agent
+    
+    The LLM reasons about what to do, tools execute actions,
+    memory maintains context across interactions.
 
-Popular Frameworks:
-- LangChain
-- AutoGPT
-- CrewAI
-- LangGraph
-- AutoGen
+AGENT LOOP:
+    Observe -> Think -> Act -> Observe -> ...
+
+WHY ARE AGENTS IMPORTANT?
+=========================
+
+1. AUTOMATION: Handle complex, multi-step tasks
+2. FLEXIBILITY: Adapt to new situations
+3. SCALABILITY: Work 24/7 without fatigue
+4. CAPABILITY: Access tools humans can't use as fast
+
+WHEN TO USE AGENTS?
+===================
+
+USE AGENTS FOR:
+    - Multi-step tasks requiring reasoning
+    - Tasks needing external tools (search, code, APIs)
+    - Open-ended problems
+    - Workflows with decision points
+
+DON'T USE AGENTS FOR:
+    - Simple, single-step tasks
+    - Tasks requiring perfect reliability
+    - High-stakes decisions without oversight
+    - When simpler solutions work
+
+WHERE ARE AGENTS USED?
+======================
+
+APPLICATIONS:
+    - Customer support (handle complex queries)
+    - Research assistants (search, summarize, analyze)
+    - Coding assistants (write, test, debug code)
+    - Personal assistants (schedule, email, tasks)
+    - Data analysis (query, visualize, report)
+
+PRODUCTS:
+    - ChatGPT with plugins/tools
+    - Claude with computer use
+    - Microsoft Copilot
+    - AutoGPT, BabyAGI
+    - Devin (coding agent)
+
+HOW DO AGENTS WORK?
+===================
+
+BASIC ARCHITECTURE:
+    1. User provides goal/task
+    2. Agent plans approach
+    3. Agent selects and uses tools
+    4. Agent observes results
+    5. Agent decides next action or completes
+    
+COMPONENTS:
+    - LLM: Reasoning engine
+    - Tools: External capabilities
+    - Memory: Short-term and long-term
+    - Planning: Task decomposition
+    - Execution: Action taking
     """)
 
-code_examples = '''
-"""
-AI Agent Examples
+
+# =============================================================================
+# SECTION 2: AGENT ARCHITECTURES
+# =============================================================================
+
+def agent_architectures():
+    """Different agent architectures"""
+    print("\n" + "=" * 70)
+    print("AGENT ARCHITECTURES")
+    print("=" * 70)
+    
+    print("""
+1. ReAct (REASONING + ACTING)
+   ===========================
+   Interleave reasoning and actions
+   
+   Format:
+   Thought: I need to find the population of France
+   Action: Search("population of France")
+   Observation: France has a population of 67 million
+   Thought: Now I have the answer
+   Action: Final Answer
+   Answer: France has 67 million people
+   
+   Pros: Interpretable, flexible
+   Cons: Can get stuck in loops
+
+2. TOOL-USE AGENTS
+   ================
+   LLM decides which tool to use
+   
+   Tools:
+   - Calculator: Math operations
+   - Search: Web search
+   - Code: Execute Python
+   - API: Call external services
+   
+   Example (OpenAI Function Calling):
+   functions = [
+       {"name": "search", "parameters": {...}},
+       {"name": "calculate", "parameters": {...}}
+   ]
+   
+   LLM returns: {"name": "search", "arguments": {"query": "..."}}
+
+3. PLANNING AGENTS
+   ================
+   Create plan before execution
+   
+   Plan-and-Execute:
+   1. Create high-level plan
+   2. Execute each step
+   3. Replan if needed
+   
+   Example:
+   Task: "Write a blog post about AI"
+   Plan:
+   1. Research AI trends
+   2. Create outline
+   3. Write introduction
+   4. Write body sections
+   5. Write conclusion
+   6. Review and edit
+
+4. HIERARCHICAL AGENTS
+   ====================
+   Manager agent delegates to worker agents
+   
+   Manager: Understands goal, assigns tasks
+   Workers: Specialized agents for subtasks
+   
+   Example:
+   Manager -> Research Agent -> Writing Agent -> Review Agent
+
+5. MULTI-AGENT SYSTEMS
+   ====================
+   Multiple agents collaborate or compete
+   
+   Patterns:
+   - Debate: Agents argue, reach consensus
+   - Collaboration: Agents work on different parts
+   - Supervision: One agent checks another's work
+   
+   Examples:
+   - AutoGen (Microsoft)
+   - CrewAI
+   - LangGraph
+
+6. REFLEXION
+   ==========
+   Agent reflects on failures and improves
+   
+   Loop:
+   1. Attempt task
+   2. Evaluate result
+   3. Reflect on what went wrong
+   4. Try again with insights
+    """)
+
+
+# =============================================================================
+# SECTION 3: TOOLS AND CAPABILITIES
+# =============================================================================
+
+def tools_and_capabilities():
+    """Agent tools and capabilities"""
+    print("\n" + "=" * 70)
+    print("AGENT TOOLS AND CAPABILITIES")
+    print("=" * 70)
+    
+    print("""
+COMMON TOOLS:
+=============
+
+1. SEARCH:
+   - Web search (Google, Bing)
+   - Document search (RAG)
+   - Database queries
+   
+2. CODE EXECUTION:
+   - Python interpreter
+   - Shell commands
+   - Jupyter notebooks
+   
+3. FILE OPERATIONS:
+   - Read/write files
+   - Parse documents (PDF, Word)
+   - Image processing
+   
+4. APIS:
+   - Weather, stocks, news
+   - Email, calendar
+   - Custom business APIs
+   
+5. BROWSER:
+   - Navigate web pages
+   - Fill forms
+   - Extract information
+   
+6. COMMUNICATION:
+   - Send emails
+   - Slack messages
+   - Create tickets
+
+TOOL DEFINITION EXAMPLE:
+========================
+
+# OpenAI Function Calling format
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "search_web",
+            "description": "Search the web for information",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "Search query"
+                    }
+                },
+                "required": ["query"]
+            }
+        }
+    }
+]
+
+# LangChain Tool
+from langchain.tools import Tool
+
+search_tool = Tool(
+    name="Search",
+    func=search_function,
+    description="Search the web for information"
+)
+
+TOOL SELECTION:
+===============
+
+LLM decides which tool based on:
+- Task requirements
+- Tool descriptions
+- Previous observations
+
+Best practices:
+- Clear, specific tool descriptions
+- Limit number of tools (cognitive load)
+- Include examples in descriptions
+    """)
+
+
+# =============================================================================
+# SECTION 4: MEMORY SYSTEMS
+# =============================================================================
+
+def memory_systems():
+    """Agent memory systems"""
+    print("\n" + "=" * 70)
+    print("AGENT MEMORY SYSTEMS")
+    print("=" * 70)
+    
+    print("""
+TYPES OF MEMORY:
+================
+
+1. SHORT-TERM (WORKING) MEMORY:
+   - Current conversation context
+   - Recent observations
+   - Limited by context window
+   
+   Implementation: Conversation history in prompt
+
+2. LONG-TERM MEMORY:
+   - Persistent across sessions
+   - Facts, experiences, preferences
+   - Retrieved when relevant
+   
+   Implementation: Vector database (RAG)
+
+3. EPISODIC MEMORY:
+   - Specific past experiences
+   - "Last time I did X, Y happened"
+   - Helps avoid repeating mistakes
+   
+   Implementation: Store and retrieve past interactions
+
+4. SEMANTIC MEMORY:
+   - General knowledge
+   - Facts about the world
+   - Domain expertise
+   
+   Implementation: Knowledge base, RAG
+
+5. PROCEDURAL MEMORY:
+   - How to do things
+   - Skills and procedures
+   - Tool usage patterns
+   
+   Implementation: Few-shot examples, fine-tuning
+
+MEMORY MANAGEMENT:
+==================
+
+CHALLENGES:
+- Context window limits
+- Relevance of retrieved memories
+- Memory staleness
+
+STRATEGIES:
+- Summarization: Compress old context
+- Selective retrieval: Only relevant memories
+- Forgetting: Remove outdated information
+- Hierarchical: Summary + details
+
+EXAMPLE IMPLEMENTATION:
+=======================
+
+class AgentMemory:
+    def __init__(self):
+        self.short_term = []  # Recent messages
+        self.long_term = VectorStore()  # Persistent
+    
+    def add(self, message):
+        self.short_term.append(message)
+        if len(self.short_term) > 10:
+            # Summarize and store
+            summary = summarize(self.short_term[:5])
+            self.long_term.add(summary)
+            self.short_term = self.short_term[5:]
+    
+    def retrieve(self, query):
+        # Get relevant long-term memories
+        relevant = self.long_term.search(query, k=3)
+        return self.short_term + relevant
+    """)
+
+
+# =============================================================================
+# SECTION 5: MULTI-DOMAIN USE CASES
+# =============================================================================
+
+def multi_domain_use_cases():
+    """Multi-domain agent use cases"""
+    print("\n" + "=" * 70)
+    print("MULTI-DOMAIN AGENT USE CASES")
+    print("=" * 70)
+    
+    print("""
+HEALTHCARE:
+===========
+- Medical research assistant
+- Patient intake automation
+- Clinical documentation
+- Drug interaction checking
+
+Example Agent:
+    Task: "Review patient symptoms and suggest tests"
+    Tools: Medical database, lab ordering system
+    Memory: Patient history, guidelines
+
+FINANCE:
+========
+- Financial analysis agent
+- Trading assistant
+- Compliance monitoring
+- Customer onboarding
+
+Example Agent:
+    Task: "Analyze company financials and write report"
+    Tools: SEC filings API, calculator, chart generator
+    Memory: Previous analyses, market context
+
+CUSTOMER SERVICE:
 =================
-"""
+- Complex query resolution
+- Multi-system troubleshooting
+- Escalation handling
+- Proactive outreach
 
-# ============================================
-# 1. Simple ReAct Agent
-# ============================================
+Example Agent:
+    Task: "Help customer with billing issue"
+    Tools: CRM, billing system, knowledge base
+    Memory: Customer history, previous interactions
 
-class ReActAgent:
-    """Reason + Act Agent"""
+RESEARCH:
+=========
+- Literature review
+- Data analysis
+- Hypothesis generation
+- Experiment design
+
+Example Agent:
+    Task: "Survey recent papers on transformer efficiency"
+    Tools: arXiv search, PDF reader, note-taking
+    Memory: Research context, key findings
+
+E-COMMERCE:
+===========
+- Product recommendations
+- Inventory management
+- Pricing optimization
+- Supplier negotiation
+
+Example Agent:
+    Task: "Optimize pricing for holiday season"
+    Tools: Sales data, competitor prices, demand forecast
+    Memory: Past promotions, market trends
+
+EDUCATION:
+==========
+- Personalized tutoring
+- Curriculum planning
+- Assessment creation
+- Learning path optimization
+
+Example Agent:
+    Task: "Create personalized study plan for calculus"
+    Tools: Curriculum database, assessment generator
+    Memory: Student progress, learning style
+    """)
+
+
+# =============================================================================
+# SECTION 6: INTERVIEW QUESTIONS
+# =============================================================================
+
+def interview_questions():
+    """Common AI agents interview questions"""
+    print("\n" + "=" * 70)
+    print("AI AGENTS INTERVIEW QUESTIONS")
+    print("=" * 70)
     
-    def __init__(self, llm, tools):
-        self.llm = llm
-        self.tools = tools
-        self.memory = []
-    
-    def run(self, query, max_steps=5):
-        observation = query
-        
-        for step in range(max_steps):
-            # Think
-            thought = self.think(observation)
-            print(f"Thought: {thought}")
-            
-            if "FINAL ANSWER" in thought:
-                return thought
-            
-            # Act
-            action, action_input = self.parse_action(thought)
-            observation = self.tools[action](action_input)
-            print(f"Observation: {observation}")
-            
-            self.memory.append({
-                'thought': thought,
-                'action': action,
-                'observation': observation
-            })
-        
-        return "Max steps reached"
-
-
-# ============================================
-# 2. LangChain Agent
-# ============================================
-
-from langchain.agents import initialize_agent, Tool
-from langchain.llms import OpenAI
-from langchain.tools import DuckDuckGoSearchRun
-
-def create_langchain_agent():
-    llm = OpenAI(temperature=0)
-    
-    tools = [
-        Tool(
-            name="Search",
-            func=DuckDuckGoSearchRun().run,
-            description="Search the internet"
-        ),
-        Tool(
-            name="Calculator",
-            func=lambda x: str(eval(x)),
-            description="Do math calculations"
-        )
+    questions = [
+        ("What is the ReAct pattern?",
+         "Reasoning and Acting interleaved. Agent alternates between thinking (reasoning about what to do) and acting (using tools). Format: Thought -> Action -> Observation -> repeat. Improves interpretability and reliability."),
+        ("How do you handle agent failures?",
+         "Strategies: Retry with different approach, fallback to simpler method, ask for human help, graceful degradation. Important: Log failures, set max iterations, have timeout."),
+        ("What's the difference between agents and chains?",
+         "Chains: Fixed sequence of steps, deterministic. Agents: Dynamic, LLM decides next action based on observations. Use chains for predictable workflows, agents for open-ended tasks."),
+        ("How do you evaluate agent performance?",
+         "Metrics: Task completion rate, steps to completion, tool usage efficiency, cost. Also: Human evaluation of quality, safety checks, edge case handling."),
+        ("What are the risks of autonomous agents?",
+         "Risks: Unintended actions, infinite loops, cost explosion, security vulnerabilities. Mitigations: Human oversight, sandboxing, rate limits, approval for sensitive actions."),
     ]
     
-    agent = initialize_agent(
-        tools, llm,
-        agent="zero-shot-react-description",
-        verbose=True
-    )
-    
-    return agent
+    for i, (q, a) in enumerate(questions, 1):
+        print(f"\nQ{i}: {q}")
+        print(f"A: {a}")
 
 
-# ============================================
-# 3. Multi-Agent System with AutoGen
-# ============================================
+# =============================================================================
+# SECTION 7: COMMON PITFALLS
+# =============================================================================
 
-import autogen
-
-def create_multi_agent_team():
-    config = [{"model": "gpt-4", "api_key": "your-key"}]
+def common_pitfalls():
+    """Common agent mistakes"""
+    print("\n" + "=" * 70)
+    print("COMMON AGENT PITFALLS")
+    print("=" * 70)
     
-    researcher = autogen.AssistantAgent(
-        name="Researcher",
-        system_message="You research and find information.",
-        llm_config={"config_list": config}
-    )
+    pitfalls = [
+        ("Infinite loops", "Set max iterations, detect repetition, add escape conditions"),
+        ("Tool misuse", "Clear tool descriptions, validate inputs, handle errors gracefully"),
+        ("Context overflow", "Summarize history, use RAG for long-term memory"),
+        ("Over-autonomy", "Add human checkpoints for important decisions"),
+        ("Poor error handling", "Catch exceptions, provide fallbacks, log for debugging"),
+        ("Cost explosion", "Set budgets, monitor usage, cache repeated calls"),
+    ]
     
-    writer = autogen.AssistantAgent(
-        name="Writer",
-        system_message="You write clear content.",
-        llm_config={"config_list": config}
-    )
-    
-    critic = autogen.AssistantAgent(
-        name="Critic",
-        system_message="You review and improve work.",
-        llm_config={"config_list": config}
-    )
-    
-    user_proxy = autogen.UserProxyAgent(
-        name="User",
-        human_input_mode="NEVER"
-    )
-    
-    groupchat = autogen.GroupChat(
-        agents=[user_proxy, researcher, writer, critic],
-        messages=[],
-        max_round=10
-    )
-    
-    return groupchat
+    for mistake, solution in pitfalls:
+        print(f"\nMistake: {mistake}")
+        print(f"Solution: {solution}")
 
 
-# ============================================
-# 4. CrewAI Team
-# ============================================
-
-from crewai import Agent, Task, Crew
-
-def create_crew():
-    researcher = Agent(
-        role="Researcher",
-        goal="Find accurate information",
-        backstory="Expert at finding facts"
-    )
-    
-    writer = Agent(
-        role="Writer",
-        goal="Create engaging content",
-        backstory="Skilled content creator"
-    )
-    
-    research_task = Task(
-        description="Research the topic",
-        agent=researcher
-    )
-    
-    write_task = Task(
-        description="Write an article",
-        agent=writer
-    )
-    
-    crew = Crew(
-        agents=[researcher, writer],
-        tasks=[research_task, write_task]
-    )
-    
-    return crew
-
-
-# ============================================
-# 5. Tool-Using Agent
-# ============================================
-
-class ToolAgent:
-    def __init__(self, llm):
-        self.llm = llm
-        self.tools = {
-            'search': self.search,
-            'calculate': self.calculate,
-            'get_weather': self.get_weather
-        }
-    
-    def search(self, query):
-        # Implement search
-        return f"Search results for: {query}"
-    
-    def calculate(self, expression):
-        return str(eval(expression))
-    
-    def get_weather(self, location):
-        return f"Weather in {location}: Sunny, 72°F"
-    
-    def run(self, user_query):
-        # Decide which tool to use
-        tool_choice = self.llm.decide_tool(user_query, list(self.tools.keys()))
-        
-        # Execute tool
-        result = self.tools[tool_choice['tool']](tool_choice['input'])
-        
-        # Generate response
-        return self.llm.generate_response(user_query, result)
-
-
-# ============================================
-# 6. Planning Agent
-# ============================================
-
-class PlanningAgent:
-    def __init__(self, llm):
-        self.llm = llm
-    
-    def create_plan(self, goal):
-        prompt = f"""
-        Goal: {goal}
-        
-        Create a step-by-step plan to achieve this goal.
-        Format each step as: Step N: [action]
-        """
-        
-        plan = self.llm.generate(prompt)
-        steps = self.parse_plan(plan)
-        return steps
-    
-    def execute_plan(self, goal):
-        plan = self.create_plan(goal)
-        results = []
-        
-        for step in plan:
-            print(f"Executing: {step}")
-            result = self.execute_step(step)
-            results.append(result)
-            
-            # Check if we need to replan
-            if not result['success']:
-                plan = self.replan(goal, results)
-        
-        return results
-
-
-# ============================================
-# 7. Memory-Enhanced Agent
-# ============================================
-
-class MemoryAgent:
-    def __init__(self, llm, vector_store):
-        self.llm = llm
-        self.memory = vector_store
-        self.short_term = []
-    
-    def remember(self, interaction):
-        self.short_term.append(interaction)
-        self.memory.add(interaction)
-    
-    def recall(self, query, k=5):
-        return self.memory.search(query, k=k)
-    
-    def chat(self, message):
-        # Recall relevant memories
-        relevant = self.recall(message)
-        
-        # Include in context
-        context = "\\n".join([m['text'] for m in relevant])
-        
-        response = self.llm.generate(
-            f"Context: {context}\\n\\nUser: {message}"
-        )
-        
-        # Remember this interaction
-        self.remember({
-            'user': message,
-            'assistant': response
-        })
-        
-        return response
-
-
-print("AI Agent examples loaded!")
-print("Install: pip install langchain autogen crewai")
-'''
+# =============================================================================
+# MAIN PROGRAM
+# =============================================================================
 
 def main():
-    explain_agents()
-    print("\nPython Code Examples:")
-    print(code_examples)
+    print("=" * 70)
+    print("   MODULE 17: AI AGENTS - COMPREHENSIVE 360 DEGREE COVERAGE")
+    print("=" * 70)
+    
+    assistant = AgentAssistant()
+    
+    while True:
+        print("\n" + "-" * 70)
+        print("Choose a topic:")
+        print()
+        print("FUNDAMENTALS:")
+        print("  1. What are AI Agents? (4W+H)")
+        print("  2. Agent Architectures")
+        print("  3. Tools and Capabilities")
+        print("  4. Memory Systems")
+        print("  5. Multi-Domain Use Cases")
+        print()
+        print("DEEP DIVE:")
+        print("  6. Interview Questions")
+        print("  7. Common Pitfalls")
+        print()
+        print("GENAI FEATURES:")
+        print("  8. AI Explanation (OpenAI)")
+        print("  9. AI Explanation (Ollama - FREE)")
+        print("  10. Run Simple Agent Demo (OpenAI)")
+        print()
+        print("  11. Run ALL Topics")
+        print("  0. Exit")
+        print("-" * 70)
+        
+        choice = input("\nEnter choice (0-11): ").strip()
+        
+        if choice == "0":
+            print("\nHappy learning!")
+            break
+        elif choice == "1":
+            explain_agents_comprehensive()
+        elif choice == "2":
+            agent_architectures()
+        elif choice == "3":
+            tools_and_capabilities()
+        elif choice == "4":
+            memory_systems()
+        elif choice == "5":
+            multi_domain_use_cases()
+        elif choice == "6":
+            interview_questions()
+        elif choice == "7":
+            common_pitfalls()
+        elif choice == "8":
+            concept = input("Enter concept to explain: ").strip()
+            print(assistant.explain_with_openai(concept))
+        elif choice == "9":
+            concept = input("Enter concept to explain: ").strip()
+            print(assistant.explain_with_ollama(concept))
+        elif choice == "10":
+            task = input("Enter task for agent: ").strip()
+            print("\nAgent Response:")
+            print(assistant.run_simple_agent(task))
+        elif choice == "11":
+            explain_agents_comprehensive()
+            agent_architectures()
+            tools_and_capabilities()
+            memory_systems()
+            multi_domain_use_cases()
+            interview_questions()
+            common_pitfalls()
+        else:
+            print("Invalid choice")
+
 
 if __name__ == "__main__":
     main()

@@ -984,12 +984,573 @@ COMMON LOSS FUNCTIONS:
 
 
 # =============================================================================
+# SECTION 6: ADVANCED LINEAR ALGEBRA
+# =============================================================================
+
+class AdvancedLinearAlgebra:
+    """
+    Advanced Linear Algebra for AI
+    ================================
+    
+    Topics: Eigenvalues, SVD, Matrix Decomposition, Tensor Operations
+    """
+    
+    @staticmethod
+    def eigenvalues_explained():
+        """
+        EIGENVALUES & EIGENVECTORS - Understanding Data Structure
+        ==========================================================
+        """
+        print("\n" + "=" * 70)
+        print("EIGENVALUES & EIGENVECTORS - Understanding Data Structure")
+        print("=" * 70)
+        
+        print("""
+WHAT ARE EIGENVALUES & EIGENVECTORS?
+------------------------------------
+For a matrix A, an eigenvector v is a special vector that only gets SCALED
+(not rotated) when multiplied by A:
+
+    A * v = λ * v
+    
+    where λ (lambda) is the eigenvalue (the scaling factor)
+
+Example:
+    A = | 2  1 |    v = | 1 |    λ = 3
+        | 1  2 |        | 1 |
+        
+    A * v = | 3 | = 3 * | 1 | = λ * v
+            | 3 |       | 1 |
+
+WHY EIGENVALUES IN AI?
+----------------------
+1. PCA (Principal Component Analysis):
+   - Eigenvectors = principal directions of data variance
+   - Eigenvalues = amount of variance in each direction
+   - Used for dimensionality reduction
+
+2. Understanding Neural Networks:
+   - Eigenvalues of weight matrices affect training stability
+   - Large eigenvalues can cause exploding gradients
+   - Small eigenvalues can cause vanishing gradients
+
+3. Graph Neural Networks:
+   - Eigenvalues of adjacency matrix reveal graph structure
+   - Used in spectral clustering
+
+WHEN ARE EIGENVALUES USED?
+--------------------------
+    - Dimensionality reduction (PCA)
+    - Analyzing covariance matrices
+    - Stability analysis of neural networks
+    - Spectral clustering
+
+WHERE IN AI?
+------------
+    - sklearn.decomposition.PCA
+    - Graph neural networks
+    - Analyzing training dynamics
+    - Recommendation systems (matrix factorization)
+        """)
+        
+        print("\nEIGENVALUE DEMO:")
+        print("-" * 40)
+        
+        if HAS_NUMPY:
+            # 2x2 matrix
+            A = np.array([[4, 2], [1, 3]])
+            eigenvalues, eigenvectors = np.linalg.eig(A)
+            
+            print(f"Matrix A:")
+            print(A)
+            print(f"\nEigenvalues: {eigenvalues}")
+            print(f"\nEigenvectors (columns):")
+            print(eigenvectors)
+            
+            # Verify: A @ v = λ * v
+            print("\nVerification (A @ v should equal λ * v):")
+            for i in range(len(eigenvalues)):
+                v = eigenvectors[:, i]
+                lam = eigenvalues[i]
+                Av = A @ v
+                lam_v = lam * v
+                print(f"  λ{i+1}={lam:.4f}: A@v = {Av}, λ*v = {lam_v}")
+        else:
+            print("Install numpy to see eigenvalue demo: pip install numpy")
+        
+        print("""
+HOW TO USE FOR PCA:
+-------------------
+# PCA reduces dimensions while preserving variance
+from sklearn.decomposition import PCA
+
+# Reduce 100 features to 10
+pca = PCA(n_components=10)
+reduced_data = pca.fit_transform(high_dim_data)
+
+# pca.explained_variance_ratio_ shows how much variance each component captures
+        """)
+    
+    @staticmethod
+    def svd_explained():
+        """
+        SVD - Singular Value Decomposition
+        ===================================
+        """
+        print("\n" + "=" * 70)
+        print("SVD - Singular Value Decomposition")
+        print("=" * 70)
+        
+        print("""
+WHAT IS SVD?
+------------
+SVD decomposes ANY matrix into three matrices:
+
+    A = U @ Σ @ V^T
+    
+    U: Left singular vectors (m x m orthogonal matrix)
+    Σ: Singular values (m x n diagonal matrix)
+    V^T: Right singular vectors (n x n orthogonal matrix)
+
+WHY SVD IN AI?
+--------------
+1. DIMENSIONALITY REDUCTION:
+   - Keep only top k singular values
+   - Compress data while preserving important information
+
+2. RECOMMENDATION SYSTEMS:
+   - Matrix factorization for collaborative filtering
+   - Netflix Prize winning approach used SVD
+
+3. NATURAL LANGUAGE PROCESSING:
+   - Latent Semantic Analysis (LSA)
+   - Word embeddings
+
+4. IMAGE COMPRESSION:
+   - Compress images by keeping top singular values
+
+WHEN IS SVD USED?
+-----------------
+    - Recommendation systems
+    - Topic modeling (LSA)
+    - Noise reduction
+    - Solving linear systems
+
+WHERE IN AI?
+------------
+    - numpy.linalg.svd
+    - scipy.sparse.linalg.svds (for large sparse matrices)
+    - sklearn.decomposition.TruncatedSVD
+        """)
+        
+        print("\nSVD DEMO:")
+        print("-" * 40)
+        
+        if HAS_NUMPY:
+            # User-item rating matrix (like Netflix)
+            ratings = np.array([
+                [5, 3, 0, 1],
+                [4, 0, 0, 1],
+                [1, 1, 0, 5],
+                [1, 0, 0, 4],
+                [0, 1, 5, 4],
+            ])
+            
+            print("User-Item Rating Matrix (0 = not rated):")
+            print(ratings)
+            
+            U, s, Vt = np.linalg.svd(ratings, full_matrices=False)
+            
+            print(f"\nSingular values: {s}")
+            print(f"Top 2 capture {100*sum(s[:2]**2)/sum(s**2):.1f}% of variance")
+            
+            # Reconstruct with only top 2 components
+            k = 2
+            reconstructed = U[:, :k] @ np.diag(s[:k]) @ Vt[:k, :]
+            
+            print(f"\nReconstructed with k={k} components:")
+            print(np.round(reconstructed, 1))
+            print("\nThis can predict missing ratings!")
+        else:
+            print("Install numpy to see SVD demo: pip install numpy")
+    
+    @staticmethod
+    def tensor_operations_explained():
+        """
+        TENSORS - Multi-dimensional Arrays
+        ====================================
+        """
+        print("\n" + "=" * 70)
+        print("TENSORS - Multi-dimensional Arrays")
+        print("=" * 70)
+        
+        print("""
+WHAT IS A TENSOR?
+-----------------
+A tensor is a generalization of vectors and matrices to higher dimensions:
+
+    Scalar:  0D tensor (single number)           5
+    Vector:  1D tensor (list of numbers)         [1, 2, 3]
+    Matrix:  2D tensor (table of numbers)        [[1,2], [3,4]]
+    3D Tensor: Cube of numbers                   [[[1,2], [3,4]], [[5,6], [7,8]]]
+
+WHY TENSORS IN AI?
+------------------
+1. IMAGES are 3D tensors:
+   - Shape: (height, width, channels)
+   - RGB image: (224, 224, 3)
+
+2. BATCHES of images are 4D tensors:
+   - Shape: (batch_size, height, width, channels)
+   - 32 images: (32, 224, 224, 3)
+
+3. SEQUENCES are 3D tensors:
+   - Shape: (batch_size, sequence_length, features)
+   - 16 sentences of 100 words with 512-dim embeddings: (16, 100, 512)
+
+4. ATTENTION is computed on tensors:
+   - Query, Key, Value are all tensors
+   - Attention scores are tensors
+
+WHEN ARE TENSORS USED?
+----------------------
+    - Every deep learning operation
+    - Batch processing
+    - Multi-dimensional data
+
+WHERE IN AI?
+------------
+    - PyTorch: torch.Tensor
+    - TensorFlow: tf.Tensor
+    - NumPy: np.ndarray
+        """)
+        
+        print("\nTENSOR DEMO:")
+        print("-" * 40)
+        
+        if HAS_NUMPY:
+            # Image batch tensor
+            batch_size = 2
+            height, width, channels = 4, 4, 3
+            
+            images = np.random.rand(batch_size, height, width, channels)
+            print(f"Image batch shape: {images.shape}")
+            print(f"  - {batch_size} images")
+            print(f"  - {height}x{width} pixels")
+            print(f"  - {channels} color channels (RGB)")
+            
+            # Sequence tensor
+            batch_size = 2
+            seq_len = 5
+            embed_dim = 8
+            
+            sequences = np.random.rand(batch_size, seq_len, embed_dim)
+            print(f"\nSequence batch shape: {sequences.shape}")
+            print(f"  - {batch_size} sequences")
+            print(f"  - {seq_len} tokens each")
+            print(f"  - {embed_dim} dimensional embeddings")
+            
+            # Tensor operations
+            print("\nCommon tensor operations:")
+            print(f"  Reshape: {images.shape} -> {images.reshape(batch_size, -1).shape}")
+            print(f"  Transpose: {sequences.shape} -> {sequences.transpose(0, 2, 1).shape}")
+            print(f"  Sum over axis: {sequences.sum(axis=1).shape}")
+        else:
+            print("Install numpy to see tensor demo: pip install numpy")
+
+
+# =============================================================================
+# SECTION 7: INFORMATION THEORY
+# =============================================================================
+
+class InformationTheory:
+    """
+    Information Theory for AI
+    ==========================
+    
+    Topics: Entropy, KL Divergence, Mutual Information
+    """
+    
+    @staticmethod
+    def entropy_explained():
+        """
+        ENTROPY - Measuring Uncertainty
+        ================================
+        """
+        print("\n" + "=" * 70)
+        print("ENTROPY - Measuring Uncertainty")
+        print("=" * 70)
+        
+        print("""
+WHAT IS ENTROPY?
+----------------
+Entropy measures the UNCERTAINTY or RANDOMNESS in a probability distribution.
+
+    H(X) = -sum(p(x) * log2(p(x)))
+
+High entropy = high uncertainty (uniform distribution)
+Low entropy = low uncertainty (peaked distribution)
+
+Example:
+    Fair coin: p = [0.5, 0.5]
+    H = -0.5*log2(0.5) - 0.5*log2(0.5) = 1 bit (maximum uncertainty)
+    
+    Biased coin: p = [0.99, 0.01]
+    H ≈ 0.08 bits (low uncertainty - almost always heads)
+
+WHY ENTROPY IN AI?
+------------------
+1. CROSS-ENTROPY LOSS:
+   - The most common loss function for classification
+   - Measures difference between predicted and true distributions
+
+2. DECISION TREES:
+   - Information gain = reduction in entropy
+   - Split on features that reduce entropy most
+
+3. LANGUAGE MODELS:
+   - Perplexity = 2^entropy
+   - Lower perplexity = better model
+
+4. VARIATIONAL AUTOENCODERS:
+   - KL divergence uses entropy concepts
+
+WHEN IS ENTROPY USED?
+---------------------
+    - Classification loss functions
+    - Decision tree splitting
+    - Evaluating language models
+    - Information bottleneck methods
+
+WHERE IN AI?
+------------
+    - torch.nn.CrossEntropyLoss
+    - sklearn.tree (information gain)
+    - Language model evaluation
+        """)
+        
+        print("\nENTROPY DEMO:")
+        print("-" * 40)
+        
+        def entropy(probs):
+            return -sum(p * math.log2(p + 1e-10) for p in probs if p > 0)
+        
+        # Different distributions
+        distributions = [
+            ("Fair coin", [0.5, 0.5]),
+            ("Biased coin (99%)", [0.99, 0.01]),
+            ("Uniform 4-class", [0.25, 0.25, 0.25, 0.25]),
+            ("Confident classifier", [0.9, 0.05, 0.03, 0.02]),
+            ("Uncertain classifier", [0.3, 0.3, 0.2, 0.2]),
+        ]
+        
+        for name, probs in distributions:
+            h = entropy(probs)
+            print(f"{name:25s}: H = {h:.4f} bits")
+        
+        print("""
+HOW CROSS-ENTROPY LOSS WORKS:
+-----------------------------
+# True label: class 0 (one-hot: [1, 0, 0])
+# Predicted: [0.7, 0.2, 0.1]
+
+# Cross-entropy = -sum(true * log(predicted))
+# CE = -1*log(0.7) - 0*log(0.2) - 0*log(0.1)
+# CE = -log(0.7) ≈ 0.36
+
+# If predicted was [0.99, 0.005, 0.005]:
+# CE = -log(0.99) ≈ 0.01 (much lower - better!)
+        """)
+    
+    @staticmethod
+    def kl_divergence_explained():
+        """
+        KL DIVERGENCE - Comparing Distributions
+        ========================================
+        """
+        print("\n" + "=" * 70)
+        print("KL DIVERGENCE - Comparing Distributions")
+        print("=" * 70)
+        
+        print("""
+WHAT IS KL DIVERGENCE?
+----------------------
+KL Divergence measures how different one probability distribution is from another.
+
+    KL(P || Q) = sum(P(x) * log(P(x) / Q(x)))
+
+Properties:
+    - KL(P || Q) >= 0 (always non-negative)
+    - KL(P || Q) = 0 only if P = Q
+    - NOT symmetric: KL(P || Q) ≠ KL(Q || P)
+
+WHY KL DIVERGENCE IN AI?
+------------------------
+1. VARIATIONAL AUTOENCODERS (VAE):
+   - Regularization term: KL(q(z|x) || p(z))
+   - Forces latent space to be Gaussian
+
+2. KNOWLEDGE DISTILLATION:
+   - Train small model to match large model's outputs
+   - Minimize KL between teacher and student distributions
+
+3. REINFORCEMENT LEARNING:
+   - PPO uses KL to limit policy updates
+   - Prevents too-large changes
+
+4. GENERATIVE MODELS:
+   - GANs implicitly minimize divergence
+   - Diffusion models use KL in ELBO
+
+WHEN IS KL DIVERGENCE USED?
+---------------------------
+    - VAE training
+    - Knowledge distillation
+    - Policy gradient methods
+    - Comparing model outputs
+
+WHERE IN AI?
+------------
+    - torch.nn.KLDivLoss
+    - VAE implementations
+    - PPO algorithms
+        """)
+        
+        print("\nKL DIVERGENCE DEMO:")
+        print("-" * 40)
+        
+        def kl_divergence(p, q):
+            return sum(pi * math.log(pi / qi + 1e-10) for pi, qi in zip(p, q) if pi > 0)
+        
+        # True distribution vs approximations
+        true_dist = [0.7, 0.2, 0.1]
+        
+        approximations = [
+            ("Perfect match", [0.7, 0.2, 0.1]),
+            ("Close approximation", [0.65, 0.25, 0.1]),
+            ("Poor approximation", [0.4, 0.4, 0.2]),
+            ("Very different", [0.1, 0.1, 0.8]),
+        ]
+        
+        print(f"True distribution: {true_dist}")
+        print()
+        for name, approx in approximations:
+            kl = kl_divergence(true_dist, approx)
+            print(f"{name:25s}: KL = {kl:.4f}")
+
+
+# =============================================================================
+# SECTION 8: NUMERICAL METHODS
+# =============================================================================
+
+class NumericalMethods:
+    """
+    Numerical Methods for AI
+    =========================
+    
+    Topics: Numerical Stability, Floating Point, Batch Normalization
+    """
+    
+    @staticmethod
+    def numerical_stability_explained():
+        """
+        NUMERICAL STABILITY - Avoiding Computational Errors
+        ====================================================
+        """
+        print("\n" + "=" * 70)
+        print("NUMERICAL STABILITY - Avoiding Computational Errors")
+        print("=" * 70)
+        
+        print("""
+WHAT IS NUMERICAL STABILITY?
+----------------------------
+Numerical stability ensures computations don't produce errors due to:
+    - Very large numbers (overflow)
+    - Very small numbers (underflow)
+    - Loss of precision
+
+WHY NUMERICAL STABILITY IN AI?
+------------------------------
+1. SOFTMAX OVERFLOW:
+   - exp(1000) = infinity!
+   - Solution: subtract max before exp
+   
+2. LOG OF SMALL PROBABILITIES:
+   - log(0.0000001) = very negative
+   - log(0) = -infinity!
+   - Solution: add small epsilon
+
+3. GRADIENT EXPLOSION/VANISHING:
+   - Deep networks multiply many gradients
+   - Can become 0 or infinity
+   - Solutions: gradient clipping, normalization
+
+COMMON STABILITY TRICKS:
+------------------------
+1. Log-sum-exp trick:
+   log(sum(exp(x))) = max(x) + log(sum(exp(x - max(x))))
+
+2. Softmax stability:
+   softmax(x) = softmax(x - max(x))
+
+3. Add epsilon:
+   log(x + 1e-10) instead of log(x)
+
+4. Gradient clipping:
+   if |gradient| > threshold: gradient = threshold * sign(gradient)
+        """)
+        
+        print("\nNUMERICAL STABILITY DEMO:")
+        print("-" * 40)
+        
+        # Unstable softmax
+        def unstable_softmax(x):
+            exp_x = [math.exp(xi) for xi in x]
+            sum_exp = sum(exp_x)
+            return [e / sum_exp for e in exp_x]
+        
+        # Stable softmax
+        def stable_softmax(x):
+            max_x = max(x)
+            exp_x = [math.exp(xi - max_x) for xi in x]
+            sum_exp = sum(exp_x)
+            return [e / sum_exp for e in exp_x]
+        
+        # Small values - both work
+        small = [1.0, 2.0, 3.0]
+        print(f"Small values {small}:")
+        print(f"  Unstable: {[f'{p:.4f}' for p in unstable_softmax(small)]}")
+        print(f"  Stable:   {[f'{p:.4f}' for p in stable_softmax(small)]}")
+        
+        # Large values - unstable fails
+        large = [100.0, 200.0, 300.0]
+        print(f"\nLarge values {large}:")
+        try:
+            result = unstable_softmax(large)
+            print(f"  Unstable: {result}")
+        except OverflowError:
+            print("  Unstable: OVERFLOW ERROR!")
+        print(f"  Stable:   {[f'{p:.4f}' for p in stable_softmax(large)]}")
+        
+        print("""
+ALWAYS USE STABLE IMPLEMENTATIONS:
+----------------------------------
+# PyTorch handles this automatically
+import torch.nn.functional as F
+probs = F.softmax(logits, dim=-1)
+
+# For cross-entropy, use combined function
+loss = F.cross_entropy(logits, targets)  # More stable than softmax + log
+        """)
+
+
+# =============================================================================
 # MAIN PROGRAM
 # =============================================================================
 
 def main():
     print("=" * 70)
-    print("   MODULE 0: MATHEMATICS FOR AI - 360 DEGREE COVERAGE")
+    print("   MODULE 0: MATHEMATICS FOR AI - COMPREHENSIVE 360 DEGREE COVERAGE")
     print("   4W+H Explanations (What, Why, When, Where, How)")
     print("=" * 70)
     
@@ -997,7 +1558,7 @@ def main():
         print("\n" + "-" * 70)
         print("Choose a topic:")
         print()
-        print("LINEAR ALGEBRA:")
+        print("LINEAR ALGEBRA (Fundamentals):")
         print("  1. Vectors (Building blocks of AI)")
         print("  2. Matrices (Heart of neural networks)")
         print("  3. Dot Product (Measuring similarity)")
@@ -1019,14 +1580,26 @@ def main():
         print("  11. Gradient Descent (How AI learns)")
         print("  12. Loss Functions (Measuring errors)")
         print()
-        print("  13. Run ALL Topics")
+        print("ADVANCED LINEAR ALGEBRA:")
+        print("  13. Eigenvalues & Eigenvectors (PCA, stability)")
+        print("  14. SVD - Singular Value Decomposition (Recommendations)")
+        print("  15. Tensors (Multi-dimensional arrays)")
+        print()
+        print("INFORMATION THEORY:")
+        print("  16. Entropy (Measuring uncertainty)")
+        print("  17. KL Divergence (Comparing distributions)")
+        print()
+        print("NUMERICAL METHODS:")
+        print("  18. Numerical Stability (Avoiding errors)")
+        print()
+        print("  19. Run ALL Topics (Comprehensive Review)")
         print("  0. Exit")
         print("-" * 70)
         
-        choice = input("\nEnter choice (0-13): ").strip()
+        choice = input("\nEnter choice (0-19): ").strip()
         
         if choice == "0":
-            print("\nHappy learning!")
+            print("\nHappy learning! You now have the math foundation for AI!")
             break
         elif choice == "1":
             LinearAlgebra.vectors_explained()
@@ -1053,7 +1626,22 @@ def main():
         elif choice == "12":
             Optimization.loss_functions_explained()
         elif choice == "13":
-            # Run all
+            AdvancedLinearAlgebra.eigenvalues_explained()
+        elif choice == "14":
+            AdvancedLinearAlgebra.svd_explained()
+        elif choice == "15":
+            AdvancedLinearAlgebra.tensor_operations_explained()
+        elif choice == "16":
+            InformationTheory.entropy_explained()
+        elif choice == "17":
+            InformationTheory.kl_divergence_explained()
+        elif choice == "18":
+            NumericalMethods.numerical_stability_explained()
+        elif choice == "19":
+            # Run all - comprehensive review
+            print("\n" + "=" * 70)
+            print("RUNNING COMPREHENSIVE MATH FOR AI REVIEW")
+            print("=" * 70)
             LinearAlgebra.vectors_explained()
             LinearAlgebra.matrices_explained()
             LinearAlgebra.dot_product_explained()
@@ -1066,6 +1654,15 @@ def main():
             Statistics.normalization_explained()
             Optimization.gradient_descent_explained()
             Optimization.loss_functions_explained()
+            AdvancedLinearAlgebra.eigenvalues_explained()
+            AdvancedLinearAlgebra.svd_explained()
+            AdvancedLinearAlgebra.tensor_operations_explained()
+            InformationTheory.entropy_explained()
+            InformationTheory.kl_divergence_explained()
+            NumericalMethods.numerical_stability_explained()
+            print("\n" + "=" * 70)
+            print("COMPREHENSIVE REVIEW COMPLETE!")
+            print("=" * 70)
         else:
             print("Invalid choice")
 
