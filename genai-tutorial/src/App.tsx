@@ -43,6 +43,7 @@ import Module13Frameworks from './modules/Module13Frameworks'
 import Module14ReinforcementLearning from './modules/Module14ReinforcementLearning'
 import Module15Ethics from './modules/Module15Ethics'
 import Module16Applications from './modules/Module16Applications'
+import Module17Agents from './modules/Module17Agents'
 
 const modules = [
   { id: 1, title: 'Introduction to AI', icon: Brain, color: 'bg-blue-500', description: 'What is AI and why it matters' },
@@ -61,6 +62,7 @@ const modules = [
   { id: 14, title: 'Reinforcement Learning', icon: Gamepad2, color: 'bg-rose-500', description: 'Learning from rewards' },
   { id: 15, title: 'AI Ethics & Safety', icon: Shield, color: 'bg-teal-500', description: 'Responsible AI use' },
   { id: 16, title: 'AI Applications', icon: Globe, color: 'bg-sky-500', description: 'AI in the real world' },
+  { id: 17, title: 'AI Agents', icon: Bot, color: 'bg-fuchsia-500', description: 'Autonomous AI systems' },
 ]
 
 const moduleComponents = [
@@ -80,6 +82,7 @@ const moduleComponents = [
   Module14ReinforcementLearning,
   Module15Ethics,
   Module16Applications,
+  Module17Agents,
 ]
 
 function App() {
